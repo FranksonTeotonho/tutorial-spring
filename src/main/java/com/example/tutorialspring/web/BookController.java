@@ -24,6 +24,11 @@ public class BookController {
         return bookRepository.findAll();
     }
 
+    @GetMapping("/count")
+    public long getCount(){
+        return bookRepository.count();
+    }
+
     @GetMapping("/title/{bookTitle}")
     public List findByTitle(@PathVariable String bookTitle){
         return bookRepository.findByTitle(bookTitle);
