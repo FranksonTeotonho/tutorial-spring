@@ -2,6 +2,7 @@ package com.example.tutorialspring.web;
 
 import com.example.tutorialspring.persistence.model.Book;
 import com.example.tutorialspring.persistence.repo.BookRepository;
+import com.example.tutorialspring.service.BookService;
 import com.example.tutorialspring.web.exception.BookNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,52 +17,51 @@ import java.util.List;
 @RequestMapping("/api/books")
 public class BookController {
 
+
     @Autowired
-    private BookRepository bookRepository;
+    private BookService bookService;
+
 
     @GetMapping
-    public Iterable findAll(){
-        return bookRepository.findAll();
+    public Iterable findAll() {
+        return bookService.findAllBooks();
     }
 
     @GetMapping("/count")
-    public long getCount(){
-        return bookRepository.count();
+    public long getCount() {
+        return bookService.countBooks();
     }
 
     @GetMapping("/title/{bookTitle}")
-    public List findByTitle(@PathVariable String bookTitle){
-        return bookRepository.findByTitle(bookTitle);
+    public List findByTitle(@PathVariable String bookTitle) {
+        return bookService.findBookByTitle(bookTitle);
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    public Book findOne(@PathVariable long id){
-        return bookRepository.findById(id);
-        //return bookRepository.findAllById(id).orElseThrow(BookNotFoundException::new);
+    public Book findOne(@PathVariable long id) {
+        return bookService.findOneBook(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Book create(@RequestBody Book book){
-        return bookRepository.save(book);
+    public Book create(@RequestBody Book book) {
+        return bookService.createBook(book);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id){
-        bookRepository.findById(id);
-        //bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
-        bookRepository.deleteById(id);
+    public void delete(@PathVariable long id) {
+        bookService.deleteBook(id);
     }
 
+    @DeleteMapping
+    public void deleteAll() {
+        bookService.deleteAllBooks();
+    }
 
-    public Book updateBook(@RequestBody Book book, @PathVariable long id){
+    @PutMapping("/{id}")
+    public Book updateBook(@RequestBody Book book, @PathVariable long id) {
 
-        if(book.getId() != id){
-            //throw  new BookIdMismatchException();
-        }
-        bookRepository.findById(id);
-        //bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
-        return bookRepository.save(book);
+        return bookService.update(book, id);
 
     }
 

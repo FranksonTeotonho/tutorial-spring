@@ -136,7 +136,13 @@ public class BookSteps {
 
     @When("I delete all books")
     public void whenIDeleteAllBooks() throws IOException {
-        HttpGet request = new HttpGet(api + "/");
+
+        HttpDelete delRequest = new HttpDelete(api + "/");
+        CloseableHttpResponse delResponse = HttpClientBuilder.create().build().execute(delRequest);
+
+        status = delResponse.getStatusLine().getStatusCode();
+        Assert.assertEquals(HttpStatus.SC_OK,status);
+        /*HttpGet request = new HttpGet(api + "/");
 
         CloseableHttpResponse response = HttpClientBuilder.create().build().execute(request);
 
@@ -152,28 +158,38 @@ public class BookSteps {
             CloseableHttpResponse delResponse = HttpClientBuilder.create().build().execute(delRequest);
             id++;
             listBookResponse.remove(0);
-        }
+        }*/
 
     }
 
-    @Then("total of books should be 0")
-    public void thenTotalOfBooksShouldBe0() throws IOException {
+    @Then("total of books should be $number")
+    public void thenTotalOfBooksShouldBe0(int number) throws IOException {
         HttpGet request = new HttpGet(api + "/count");
 
         CloseableHttpResponse response = HttpClientBuilder.create().build().execute(request);
         HttpEntity entity = response.getEntity();
         int total =  Integer.parseInt(EntityUtils.toString( entity));
 
-        Assert.assertEquals(0, total);
+        Assert.assertEquals(number, total);
     }
 
-    @Then("total of books should be 3")
-    public void thenTotalofBooksShouldBe3() throws IOException {
-        HttpGet request = new HttpGet(api + "/count");
+    @When("I delete book with title $title")
+    public void whenIDeleteBookWithTitle(String title) throws IOException {
+
+        HttpGet request = new HttpGet(api + "/title/" + title);
 
         CloseableHttpResponse response = HttpClientBuilder.create().build().execute(request);
-        int total =  Integer.parseInt(EntityUtils.toString( response.getEntity()));
 
-        Assert.assertEquals(3, total);
+        List<Book> listBookResponse = objectMapper.readValue(EntityUtils.toString(response.getEntity()), new TypeReference<List<Book>>(){});
+        book = listBookResponse.get(0);
+
+        long id = book.getId();
+
+        HttpDelete delRequest = new HttpDelete(api + "/" + String.valueOf(id));
+        CloseableHttpResponse delResponse = HttpClientBuilder.create().build().execute(delRequest);
+        status = delResponse.getStatusLine().getStatusCode();
+        Assert.assertEquals(HttpStatus.SC_OK,status);
     }
+
+
 }

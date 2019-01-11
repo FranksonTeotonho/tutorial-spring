@@ -46,5 +46,5 @@ When I create a book with title Ulisses and author James_Joyce
 When I create a book with title A_Divina_Comedia and author Dante_Alighieri
 Then total of books should be 3
 
-When I delete book with title nome do livro 1
+When I delete book with title Cem_Anos_de_Solidao
 Then total of books should be 2
